@@ -31,14 +31,17 @@ public class Sign implements Listener {
     }
 
     @EventHandler
-    public void onSignPlaced(SignChangeEvent e) {
-        if (!e.getPlayer().hasPermission("masuitewarps.warp.sign.create")) {
+    public void onSignPlaced(SignChangeEvent event) {
+        if (!event.getPlayer().hasPermission("masuitewarps.warp.sign.create")) {
             return;
         }
-        if (e.getLine(1).equalsIgnoreCase("[Warp]") && e.getLine(2) != null) {
-            String warpLine = e.getLine(2);
+        if ("[Warp]".equalsIgnoreCase(event.getLine(1)) && event.getLine(2) != null) {
+            String warpLine = event.getLine(2);
             for (int i = 0; i < 4; i++) {
-                e.setLine(i, colorize(formats()[i].replace("%warp%", warpLine)));
+                if (warpLine == null) {
+                    continue;
+                }
+                event.setLine(i, colorize(formats()[i].replace("%warp%", warpLine)));
             }
         }
     }

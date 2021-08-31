@@ -4,6 +4,9 @@ import dev.masa.masuitewarps.bungee.MaSuiteWarps;
 import dev.masa.masuitewarps.core.models.Warp;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+/**
+ * @author Masa
+ */
 public class TeleportController {
     private final MaSuiteWarps plugin;
 

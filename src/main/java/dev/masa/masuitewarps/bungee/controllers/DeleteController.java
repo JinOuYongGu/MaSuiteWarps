@@ -8,6 +8,9 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Map;
 
+/**
+ * @author Masa
+ */
 public class DeleteController {
 
     private final MaSuiteWarps plugin;

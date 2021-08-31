@@ -23,6 +23,9 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
+/**
+ * @author Masa
+ */
 public class MaSuiteWarps extends Plugin implements Listener {
 
     private final TeleportController teleportController = new TeleportController(this);
@@ -90,13 +93,13 @@ public class MaSuiteWarps extends Plugin implements Listener {
 
     @EventHandler
     public void onPluginMessage(PluginMessageEvent e) throws IOException {
-        if (!e.getTag().equals("BungeeCord")) {
+        if (!"BungeeCord".equals(e.getTag())) {
             return;
         }
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(e.getData()));
         String subchannel = in.readUTF();
 
-        if (subchannel.equals("ListWarps")) {
+        if ("ListWarps".equals(subchannel)) {
             ProxiedPlayer player = getProxy().getPlayer(in.readUTF());
             if (player == null) {
                 return;
@@ -104,16 +107,16 @@ public class MaSuiteWarps extends Plugin implements Listener {
             list.listWarp(player, in.readBoolean(), in.readBoolean(), in.readBoolean());
         }
 
-        if (subchannel.equals("Warp")) {
+        if ("Warp".equals(subchannel)) {
             teleportController.teleport(getProxy().getPlayer(in.readUTF()), in.readUTF(), in.readBoolean(), in.readBoolean(), in.readBoolean(), in.readBoolean());
         }
 
-        if (subchannel.equals("CheckPerWarpFlag")) {
+        if ("CheckPerWarpFlag".equals(subchannel)) {
             ProxiedPlayer player = getProxy().getPlayer(in.readUTF());
             new BungeePluginChannel(this, player.getServer().getInfo(), "SetPerWarpFlag", perWarpPermission).send();
         }
 
-        if (subchannel.equals("SetWarp")) {
+        if ("SetWarp".equals(subchannel)) {
             ProxiedPlayer player = getProxy().getPlayer(in.readUTF());
             if (player == null) {
                 return;
@@ -123,14 +126,14 @@ public class MaSuiteWarps extends Plugin implements Listener {
 
             set.setWarp(player, name, location, in.readBoolean(), in.readBoolean());
         }
-        if (subchannel.equals("DelWarp")) {
+        if ("DelWarp".equals(subchannel)) {
             ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
             if (p == null) {
                 return;
             }
             delete.deleteWarp(p, in.readUTF());
         }
-        if (subchannel.equals("RequestWarps")) {
+        if ("RequestWarps".equals(subchannel)) {
             this.getWarpService().sendAllWarpsToServers();
         }
     }

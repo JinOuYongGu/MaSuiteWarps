@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * @author Masa
+ */
 public class MaSuiteWarps extends JavaPlugin implements Listener {
 
     public MaSuiteCoreBukkitAPI api = new MaSuiteCoreBukkitAPI();
@@ -39,7 +42,10 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
         manager.getCommandCompletions().registerCompletion("warps", c -> {
             List<String> warpNames = new ArrayList<>();
             for (Warp warp : warps.values()) {
-                if (perServerWarps && (!c.getPlayer().hasPermission("masuitewarps.warp.to." + warp.getName()) || !(c.getPlayer().hasPermission("masuitewarps.warp.to.*")))) {
+                if (perServerWarps && (!c.getPlayer().hasPermission("masuitewarps.warp.to." + warp.getName()))) {
+                    continue;
+                }
+                if (!(c.getPlayer().hasPermission("masuitewarps.warp.to.*"))) {
                     continue;
                 }
                 if (warp.isHidden() && !c.getPlayer().hasPermission("masuitewarps.list.hidden")) {

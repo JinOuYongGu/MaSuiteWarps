@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import javax.persistence.Table;
 
 
+/**
+ * @author Masa
+ */
 @NoArgsConstructor
 @RequiredArgsConstructor
 @Data

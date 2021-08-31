@@ -9,6 +9,9 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Map;
 
+/**
+ * @author Masa
+ */
 public class SetController {
 
     private final MaSuiteWarps plugin;

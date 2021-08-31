@@ -10,6 +10,9 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.List;
 
+/**
+ * @author Masa
+ */
 public class ListController {
 
     private final MaSuiteWarps plugin;

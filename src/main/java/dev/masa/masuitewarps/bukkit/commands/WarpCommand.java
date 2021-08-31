@@ -11,6 +11,9 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+/**
+ * @author Masa
+ */
 public class WarpCommand extends BaseCommand {
 
     private final MaSuiteWarps plugin;
@@ -28,7 +31,7 @@ public class WarpCommand extends BaseCommand {
                                     @Optional @CommandPermission("masuitewarps.warp.other") OnlinePlayer onlinePlayer,
                                     @Optional @Single @CommandPermission("masuitewarps.warp.silent") String silentArg) {
 
-        boolean silent = silentArg != null && silentArg.equalsIgnoreCase("-s");
+        boolean silent = "-s".equalsIgnoreCase(silentArg);
 
         // Check if player has permission to teleport to warp if per server warps is enabled
         if (plugin.perServerWarps) {
@@ -52,13 +55,13 @@ public class WarpCommand extends BaseCommand {
                 }
             }
 
-            if (onlinePlayer != null)
+            if (onlinePlayer != null) {
                 new BukkitPluginChannel(plugin, onlinePlayer.player, "Warp", onlinePlayer.player.getName(), name, true, true, true, silent).send();
+            }
             return;
         }
         Player player = (Player) sender;
 
-        boolean finalSilent = silent;
         plugin.api.getWarmupService().applyWarmup(player, "masuitewarps.warmup.override", "warps", success -> {
             if (success) {
                 new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "GetLocation", player.getName(), BukkitAdapter.adapt(player.getLocation()).serialize()).send();
@@ -66,7 +69,7 @@ public class WarpCommand extends BaseCommand {
                         player.hasPermission("masuitewarps.warp.global"),
                         player.hasPermission("masuitewarps.warp.server"),
                         player.hasPermission("masuitewarps.warp.hidden"),
-                        finalSilent).send();
+                        silent).send();
             }
         });
     }
@@ -84,35 +87,35 @@ public class WarpCommand extends BaseCommand {
             type = "global";
         }
 
-        if (!publicity.equalsIgnoreCase("hidden") && !publicity.equalsIgnoreCase("public")) {
+        if (!"hidden".equalsIgnoreCase(publicity) && !"public".equalsIgnoreCase(publicity)) {
             return;
         }
 
-        if (!type.equalsIgnoreCase("server") && !type.equalsIgnoreCase("global")) {
+        if (!"server".equalsIgnoreCase(type) && !"global".equalsIgnoreCase(type)) {
             return;
         }
 
-        if (publicity.equalsIgnoreCase("hidden") && !player.hasPermission("masuitewarps.warp.set.hidden")) {
+        if ("hidden".equalsIgnoreCase(publicity) && !player.hasPermission("masuitewarps.warp.set.hidden")) {
             sendNoPermissionMessage(player);
             return;
         }
 
-        if (publicity.equalsIgnoreCase("public") && !player.hasPermission("masuitewarps.warp.set.public")) {
+        if ("public".equalsIgnoreCase(publicity) && !player.hasPermission("masuitewarps.warp.set.public")) {
             sendNoPermissionMessage(player);
             return;
         }
 
-        if (type.equalsIgnoreCase("server") && !player.hasPermission("masuitewarps.warp.set.server")) {
+        if ("server".equalsIgnoreCase(type) && !player.hasPermission("masuitewarps.warp.set.server")) {
             sendNoPermissionMessage(player);
             return;
         }
 
-        if (type.equalsIgnoreCase("global") && !player.hasPermission("masuitewarps.warp.set.global")) {
+        if ("global".equalsIgnoreCase(type) && !player.hasPermission("masuitewarps.warp.set.global")) {
             sendNoPermissionMessage(player);
             return;
         }
 
-        new BukkitPluginChannel(plugin, player, "SetWarp", player.getName(), name, stringLocation, publicity.equalsIgnoreCase("hidden"), type.equalsIgnoreCase("global")).send();
+        new BukkitPluginChannel(plugin, player, "SetWarp", player.getName(), name, stringLocation, "hidden".equalsIgnoreCase(publicity), "global".equalsIgnoreCase(type)).send();
     }
 
     @CommandAlias("delwarp|warpdel|deletewarp")
