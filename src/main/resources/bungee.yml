@@ -2,4 +2,4 @@ name: MaSuiteWarps
 main: dev.masa.masuitewarps.bungee.MaSuiteWarps
 version: ${project.version}
 author: Masagameplay
-depends: [MaSuiteCore]
+depends: [ MaSuiteCore ]

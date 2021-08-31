@@ -16,7 +16,7 @@ import java.util.List;
 
 public class Sign implements Listener {
 
-    private MaSuiteWarps plugin;
+    private final MaSuiteWarps plugin;
 
     public Sign(MaSuiteWarps p) {
         plugin = p;

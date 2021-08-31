@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class SetController {
 
-    private MaSuiteWarps plugin;
+    private final MaSuiteWarps plugin;
 
     public SetController(MaSuiteWarps plugin) {
         this.plugin = plugin;

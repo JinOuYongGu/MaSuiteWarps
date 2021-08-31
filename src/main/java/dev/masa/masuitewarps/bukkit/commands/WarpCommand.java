@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 
 public class WarpCommand extends BaseCommand {
 
-    private MaSuiteWarps plugin;
+    private final MaSuiteWarps plugin;
 
     public WarpCommand(MaSuiteWarps plugin) {
         this.plugin = plugin;
@@ -28,10 +28,7 @@ public class WarpCommand extends BaseCommand {
                                     @Optional @CommandPermission("masuitewarps.warp.other") OnlinePlayer onlinePlayer,
                                     @Optional @Single @CommandPermission("masuitewarps.warp.silent") String silentArg) {
 
-        boolean silent = false;
-        if (silentArg != null && silentArg.equalsIgnoreCase("-s")) {
-            silent = true;
-        }
+        boolean silent = silentArg != null && silentArg.equalsIgnoreCase("-s");
 
         // Check if player has permission to teleport to warp if per server warps is enabled
         if (plugin.perServerWarps) {
@@ -55,7 +52,7 @@ public class WarpCommand extends BaseCommand {
                 }
             }
 
-            if(onlinePlayer != null)
+            if (onlinePlayer != null)
                 new BukkitPluginChannel(plugin, onlinePlayer.player, "Warp", onlinePlayer.player.getName(), name, true, true, true, silent).send();
             return;
         }

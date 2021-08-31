@@ -3,7 +3,10 @@ package dev.masa.masuitewarps.core.models;
 import com.google.gson.Gson;
 import com.j256.ormlite.field.DatabaseField;
 import dev.masa.masuitecore.core.objects.Location;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Table;
 

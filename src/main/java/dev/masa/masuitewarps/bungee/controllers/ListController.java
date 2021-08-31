@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ListController {
 
-    private MaSuiteWarps plugin;
+    private final MaSuiteWarps plugin;
 
     public ListController(MaSuiteWarps plugin) {
         this.plugin = plugin;

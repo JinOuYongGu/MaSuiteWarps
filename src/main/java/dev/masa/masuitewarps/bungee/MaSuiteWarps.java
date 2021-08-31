@@ -25,39 +25,31 @@ import java.io.IOException;
 
 public class MaSuiteWarps extends Plugin implements Listener {
 
+    private final TeleportController teleportController = new TeleportController(this);
+    private final SetController set = new SetController(this);
+    private final DeleteController delete = new DeleteController(this);
+    private final ListController list = new ListController(this);
     @Getter
-    private WarpService warpService;
-
+    private final MaSuiteCoreAPI api = new MaSuiteCoreAPI();
     public Utils utils = new Utils();
     public BungeeConfiguration config = new BungeeConfiguration();
     public Formator formator = new Formator();
-
     public boolean perWarpPermission = false;
-
     public String warpNotFound = "";
     public String noPermission = "";
     public String warpInOtherServer = "";
     public String teleported = "";
-
     public String listHeaderGlobal = "";
     public String listHeaderServer = "";
     public String listHeaderHidden = "";
-
     public String listWarpName = "";
     public String listHoverText = "";
     public String listWarpSplitter = "";
-
     public String warpCreated = "";
     public String warpUpdated = "";
     public String warpDeleted = "";
-
-    private TeleportController teleportController = new TeleportController(this);
-    private SetController set = new SetController(this);
-    private DeleteController delete = new DeleteController(this);
-    private ListController list = new ListController(this);
-
     @Getter
-    private MaSuiteCoreAPI api = new MaSuiteCoreAPI();
+    private WarpService warpService;
 
     @Override
     public void onEnable() {

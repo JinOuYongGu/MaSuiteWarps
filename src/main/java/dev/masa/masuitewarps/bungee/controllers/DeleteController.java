@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class DeleteController {
 
-    private MaSuiteWarps plugin;
+    private final MaSuiteWarps plugin;
 
     public DeleteController(MaSuiteWarps plugin) {
         this.plugin = plugin;

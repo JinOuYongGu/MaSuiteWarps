@@ -26,10 +26,8 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
 
     public BukkitConfiguration config = new BukkitConfiguration();
     public Formator formator = new Formator();
-
-    private boolean requestedPerServerWarps = false;
     public boolean perServerWarps = false;
-
+    private boolean requestedPerServerWarps = false;
 
     @Override
     public void onEnable() {

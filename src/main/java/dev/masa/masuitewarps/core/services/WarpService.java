@@ -22,9 +22,9 @@ import java.util.concurrent.TimeUnit;
 public class WarpService {
 
     @Getter
-    private HashMap<String, Warp> warps = new HashMap<>();
-    private Dao<Warp, Integer> warpDao;
-    private MaSuiteWarps plugin;
+    private final HashMap<String, Warp> warps = new HashMap<>();
+    private final Dao<Warp, Integer> warpDao;
+    private final MaSuiteWarps plugin;
 
     @SneakyThrows
     public WarpService(MaSuiteWarps plugin) {
