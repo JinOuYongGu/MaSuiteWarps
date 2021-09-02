@@ -6,3 +6,8 @@ depends: [ MaSuiteCore ]
 softdepend: [ Multiverse, Multiworld ]
 loadbefore: [ Essentials ]
 api-version: 1.13
+commands:
+  setwarp:
+    permission: masuitewarps.warp.set
+  warp:
+    permission: masuitewarps.warp

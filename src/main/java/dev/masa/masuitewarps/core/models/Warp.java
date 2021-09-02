@@ -1,6 +1,7 @@
 package dev.masa.masuitewarps.core.models;
 
 import com.google.gson.Gson;
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import dev.masa.masuitecore.core.objects.Location;
 import lombok.Data;
@@ -9,6 +10,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Table;
+import java.util.UUID;
 
 
 /**
@@ -20,11 +22,23 @@ import javax.persistence.Table;
 @Table(name = "masuite_warps")
 public class Warp {
 
+    /**
+     * ID of the Warp Point
+     */
     @DatabaseField(generatedId = true)
     private int id;
 
+    /**
+     * Name of the Warp Point
+     */
     @DatabaseField(unique = true, canBeNull = false)
     private String name;
+
+    /**
+     * Owner (Creator) of the Warp Point
+     */
+    @DatabaseField(dataType = DataType.UUID, canBeNull = false)
+    private UUID owner;
 
     @NonNull
     @DatabaseField
@@ -34,6 +48,9 @@ public class Warp {
     @DatabaseField
     private Boolean global;
 
+    /**
+     * Location
+     */
     @DatabaseField
     private String server;
     @DatabaseField
@@ -49,11 +66,12 @@ public class Warp {
     @DatabaseField
     private Float pitch = 0.0F;
 
-    public Warp(String name, boolean publicity, boolean type, Location location) {
+    public Warp(String name, boolean publicity, boolean type, Location location, UUID ownerId) {
         this.name = name;
         this.hidden = publicity;
         this.global = type;
         this.setLocation(location);
+        this.owner = ownerId;
     }
 
     public Location getLocation() {

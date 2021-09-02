@@ -7,8 +7,12 @@ import dev.masa.masuitecore.core.api.MaSuiteCoreBukkitAPI;
 import dev.masa.masuitecore.core.channels.BukkitPluginChannel;
 import dev.masa.masuitecore.core.configuration.BukkitConfiguration;
 import dev.masa.masuitecore.core.utils.CommandManagerUtil;
+import dev.masa.masuitewarps.bukkit.commands.MaSuiteWarpsCommand;
 import dev.masa.masuitewarps.bukkit.commands.WarpCommand;
 import dev.masa.masuitewarps.core.models.Warp;
+import lombok.Getter;
+import org.bukkit.Bukkit;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -17,47 +21,28 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Masa
  */
 public class MaSuiteWarps extends JavaPlugin implements Listener {
-
     public MaSuiteCoreBukkitAPI api = new MaSuiteCoreBukkitAPI();
-
     public HashMap<String, Warp> warps = new HashMap<>();
-
     public BukkitConfiguration config = new BukkitConfiguration();
     public Formator formator = new Formator();
     public boolean perServerWarps = false;
     private boolean requestedPerServerWarps = false;
+    @Getter
+    private static MaSuiteWarps plugin;
 
     @Override
     public void onEnable() {
-        // Create configs
+        plugin = this;
+
+        // Create config and message file
         config.create(this, "warps", "config.yml");
-
-        PaperCommandManager manager = new PaperCommandManager(this);
-        manager.registerCommand(new WarpCommand(this));
-        manager.getCommandCompletions().registerCompletion("warps", c -> {
-            List<String> warpNames = new ArrayList<>();
-            for (Warp warp : warps.values()) {
-                if (perServerWarps && (!c.getPlayer().hasPermission("masuitewarps.warp.to." + warp.getName()))) {
-                    continue;
-                }
-                if (!(c.getPlayer().hasPermission("masuitewarps.warp.to.*"))) {
-                    continue;
-                }
-                if (warp.isHidden() && !c.getPlayer().hasPermission("masuitewarps.list.hidden")) {
-                    continue;
-                }
-                warpNames.add(warp.getName());
-            }
-            return warpNames;
-        });
-
-        CommandManagerUtil.registerMaSuitePlayerCommandCompletion(manager);
-        CommandManagerUtil.registerCooldownCondition(manager);
+        config.create(this, "warps", "messages.yml");
 
         // Register listeners
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
@@ -66,6 +51,13 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
         // Register events
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new Sign(this), this);
+
+        // Register commands
+        MaSuiteWarpsCommand maSuiteWarpsCommand = new MaSuiteWarpsCommand();
+        for (final String commandName : getDescription().getCommands().keySet()) {
+            Objects.requireNonNull(Bukkit.getPluginCommand(commandName)).setTabCompleter(maSuiteWarpsCommand);
+            Objects.requireNonNull(Bukkit.getPluginCommand(commandName)).setExecutor(maSuiteWarpsCommand);
+        }
 
         new Updator(getDescription().getVersion(), getDescription().getName(), "60454").checkUpdates();
 

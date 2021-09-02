@@ -8,6 +8,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author Masa
@@ -20,40 +21,32 @@ public class SetController {
         this.plugin = plugin;
     }
 
-    public Warp setWarp(ProxiedPlayer player, String name, Location loc, boolean publicity, boolean type) {
+    public void setWarp(ProxiedPlayer player, String name, Location loc, boolean publicity, boolean type) {
         Warp warp = plugin.getWarpService().getWarp(name);
 
-        boolean exists = warp != null;
         loc.setServer(player.getServer().getInfo().getName());
+        UUID owner = player.getUniqueId();
 
-        if (warp == null) {
-            warp = new Warp(name, publicity, type, loc);
-        } else {
+        if (warp != null) {
             warp.setHidden(publicity);
             warp.setGlobal(type);
             warp.setLocation(loc);
-        }
-
-        return create(player, warp, exists);
-    }
-
-    private Warp create(ProxiedPlayer player, Warp warp, boolean exists) {
-        if (exists) {
+            warp.setOwner(owner);
             plugin.getWarpService().updateWarp(warp);
-            plugin.formator.sendMessage(player, plugin.warpUpdated.replace("%warp%", warp.getName()));
         } else {
+            warp = new Warp(name, publicity, type, loc, owner);
             plugin.getWarpService().createWarp(warp);
-            plugin.formator.sendMessage(player, plugin.warpCreated.replace("%warp%", warp.getName()));
         }
+        plugin.formator.sendMessage(player, plugin.warpUpdated.replace("%warp%", warp.getName()));
 
         for (Map.Entry<String, ServerInfo> entry : plugin.getProxy().getServers().entrySet()) {
             ServerInfo serverInfo = entry.getValue();
+            Warp finalWarp = warp;
             serverInfo.ping((result, error) -> {
                 if (error == null) {
-                    new BungeePluginChannel(plugin, serverInfo, "CreateWarp", warp.serialize()).send();
+                    new BungeePluginChannel(plugin, serverInfo, "CreateWarp", finalWarp.serialize()).send();
                 }
             });
         }
-        return warp;
     }
 }

@@ -13,10 +13,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -103,6 +100,20 @@ public class WarpService {
      */
     public List<Warp> getAllWarps() {
         return new ArrayList<>(warps.values());
+    }
+
+    /**
+     * Get player all warps
+     *
+     * @return returns a list of warps of specified player
+     */
+    public List<Warp> getPlayerWarps(UUID playerUuid) {
+        try {
+            return warpDao.queryBuilder().orderBy("name", true).where().in("owner", playerUuid).query();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
     }
 
     /**

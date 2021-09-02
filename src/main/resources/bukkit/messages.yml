@@ -1,0 +1,6 @@
+Msg:
+  invalid-warp-name: §b[系统] §a传送点名称格式错误
+  no-such-warp: §b[系统] §a传送点不存在
+  no-such-player: §b[系统] §该玩家不在线
+  no-permission: §b[系统] §a未知指令
+  wrong-command-format: &b[系统] 未知指令

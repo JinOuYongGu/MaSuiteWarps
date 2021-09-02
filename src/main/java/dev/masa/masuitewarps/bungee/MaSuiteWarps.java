@@ -133,6 +133,13 @@ public class MaSuiteWarps extends Plugin implements Listener {
             }
             delete.deleteWarp(p, in.readUTF());
         }
+        if ("DelWarpOther".equalsIgnoreCase(subchannel)) {
+            ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
+            if (p == null) {
+                return;
+            }
+            delete.deleteOthersWarp(p, in.readUTF(), in.readUTF());
+        }
         if ("RequestWarps".equals(subchannel)) {
             this.getWarpService().sendAllWarpsToServers();
         }
