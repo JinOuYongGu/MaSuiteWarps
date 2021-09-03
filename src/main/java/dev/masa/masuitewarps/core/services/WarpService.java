@@ -38,20 +38,8 @@ public class WarpService {
      *
      * @param player player to teleport
      * @param warp   target warp
-     * @param silent do we send a message to the player or not
      */
-    public void teleportToWarp(ProxiedPlayer player, Warp warp, boolean silent) {
-        this.teleport(player, warp, silent);
-    }
-
-    /**
-     * Teleports {@link ProxiedPlayer} to {@link Warp}
-     *
-     * @param player player to teleport
-     * @param warp   target warp
-     * @param silent do we send a message to the player or not
-     */
-    private void teleport(ProxiedPlayer player, Warp warp, boolean silent) {
+    public void teleportToWarp(ProxiedPlayer player, Warp warp) {
         new BungeePluginChannel(plugin,
                 player.getServer().getInfo(),
                 "MaSuiteTeleports",
@@ -77,10 +65,7 @@ public class WarpService {
         } else {
             bsc.send();
         }
-        if (!silent) {
-            plugin.formator.sendMessage(player, plugin.teleported.replace("%warp%", warp.getName()));
-        }
-
+        plugin.formator.sendMessage(player, plugin.teleported.replace("%warp%", warp.getName()));
     }
 
     /**
@@ -120,9 +105,8 @@ public class WarpService {
      * Creates a warp
      *
      * @param warp warp to create
-     * @return returns created warp
      */
-    public Warp createWarp(Warp warp) {
+    public void createWarp(Warp warp) {
         plugin.getProxy().getScheduler().runAsync(plugin, () -> {
             try {
                 warpDao.create(warp);
@@ -132,7 +116,6 @@ public class WarpService {
         });
         warps.put(warp.getName().toLowerCase(), warp);
         this.sendWarpToServers(warp);
-        return warp;
     }
 
     /**
@@ -215,7 +198,9 @@ public class WarpService {
      * Sends a list of warp to every server
      */
     public void sendAllWarpsToServers() {
-        this.getAllWarps().forEach(this::sendWarpToServers);
+        for (Warp warp : getAllWarps()) {
+            sendWarpToServers(warp);
+        }
     }
 
     /**

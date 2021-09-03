@@ -11,3 +11,7 @@ commands:
     permission: masuitewarps.warp.set
   warp:
     permission: masuitewarps.warp
+  delwarp:
+    permission: masuitewarps.warp.delete
+  warps:
+    permission: masuitewarps.warp.list

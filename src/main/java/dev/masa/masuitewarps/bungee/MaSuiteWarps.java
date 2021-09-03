@@ -42,7 +42,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
     public String noPermission = "";
     public String warpInOtherServer = "";
     public String teleported = "";
-    public String listHeaderGlobal = "";
+    public String listHeader = "";
     public String listHeaderServer = "";
     public String listHeaderHidden = "";
     public String listWarpName = "";
@@ -77,15 +77,10 @@ public class MaSuiteWarps extends Plugin implements Listener {
         noPermission = config.load("warps", "messages.yml").getString("no-permission");
         warpInOtherServer = config.load("warps", "messages.yml").getString("warp-in-other-server");
         teleported = config.load("warps", "messages.yml").getString("teleported");
-
-        listHeaderGlobal = config.load("warps", "messages.yml").getString("warp.global");
-        listHeaderServer = config.load("warps", "messages.yml").getString("warp.server");
-        listHeaderHidden = config.load("warps", "messages.yml").getString("warp.hidden");
-
+        listHeader = config.load("warps", "messages.yml").getString("warp.list");
         listWarpName = config.load("warps", "messages.yml").getString("warp.name");
         listHoverText = config.load("warps", "messages.yml").getString("warp-hover-text");
         listWarpSplitter = config.load("warps", "messages.yml").getString("warp.split");
-
         warpCreated = config.load("warps", "messages.yml").getString("warp-created");
         warpUpdated = config.load("warps", "messages.yml").getString("warp-updated");
         warpDeleted = config.load("warps", "messages.yml").getString("warp-deleted");
@@ -104,11 +99,12 @@ public class MaSuiteWarps extends Plugin implements Listener {
             if (player == null) {
                 return;
             }
-            list.listWarp(player, in.readBoolean(), in.readBoolean(), in.readBoolean());
+            list.listWarp(player);
         }
 
         if ("Warp".equals(subchannel)) {
-            teleportController.teleport(getProxy().getPlayer(in.readUTF()), in.readUTF(), in.readBoolean(), in.readBoolean(), in.readBoolean(), in.readBoolean());
+            ProxiedPlayer player = getProxy().getPlayer(in.readUTF());
+            teleportController.teleport(player, in.readUTF());
         }
 
         if ("CheckPerWarpFlag".equals(subchannel)) {
@@ -123,15 +119,16 @@ public class MaSuiteWarps extends Plugin implements Listener {
             }
             String name = in.readUTF();
             Location location = new Location().deserialize(in.readUTF());
+            int maxWarpCount = in.readInt();
 
-            set.setWarp(player, name, location, in.readBoolean(), in.readBoolean());
+            set.setWarp(player, name, location, maxWarpCount);
         }
         if ("DelWarp".equals(subchannel)) {
             ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
             if (p == null) {
                 return;
             }
-            delete.deleteWarp(p, in.readUTF());
+            delete.deleteWarp(p, p.getUniqueId(), in.readUTF());
         }
         if ("DelWarpOther".equalsIgnoreCase(subchannel)) {
             ProxiedPlayer p = getProxy().getPlayer(in.readUTF());

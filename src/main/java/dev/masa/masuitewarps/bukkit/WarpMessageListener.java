@@ -47,8 +47,7 @@ public class WarpMessageListener implements org.bukkit.plugin.messaging.PluginMe
                 p.teleport(bukkitLocation);
             }
             if ("CreateWarp".equals(subchannel)) {
-                Warp warp = new Warp();
-                warp = warp.deserialize(in.readUTF().toLowerCase());
+                Warp warp = Warp.deserialize(in.readUTF().toLowerCase());
                 plugin.warps.put(warp.getName(), warp);
             }
             if ("WarpCooldown".equals(subchannel)) {

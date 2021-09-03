@@ -1,13 +1,12 @@
 package dev.masa.masuitewarps.bungee.controllers;
 
-import dev.masa.masuitecore.core.channels.BungeePluginChannel;
+import dev.masa.masuitecore.core.configuration.BungeeConfiguration;
 import dev.masa.masuitecore.core.objects.Location;
 import dev.masa.masuitewarps.bungee.MaSuiteWarps;
 import dev.masa.masuitewarps.core.models.Warp;
-import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -16,37 +15,48 @@ import java.util.UUID;
 public class SetController {
 
     private final MaSuiteWarps plugin;
+    private final BungeeConfiguration config = new BungeeConfiguration();
 
     public SetController(MaSuiteWarps plugin) {
         this.plugin = plugin;
     }
 
-    public void setWarp(ProxiedPlayer player, String name, Location loc, boolean publicity, boolean type) {
-        Warp warp = plugin.getWarpService().getWarp(name);
+    /**
+     * @param player       command sender
+     * @param warpName     name of the warp
+     * @param loc          location of the warp
+     * @param maxWarpCount the max count of the player's warps, which is unlimited if equals -1
+     */
+    public void setWarp(ProxiedPlayer player, String warpName, Location loc, int maxWarpCount) {
+        List<Warp> playerWarps = plugin.getWarpService().getPlayerWarps(player.getUniqueId());
+        if (maxWarpCount >= 0 && playerWarps.size() >= maxWarpCount) {
+            plugin.formator.sendMessage(player, config.load("warps", "messages.yml").getString("warp-limit-reached"));
+            return;
+        }
 
+        // Update the location's server to current server
         loc.setServer(player.getServer().getInfo().getName());
         UUID owner = player.getUniqueId();
 
+        Warp warp = plugin.getWarpService().getWarp(warpName);
         if (warp != null) {
-            warp.setHidden(publicity);
-            warp.setGlobal(type);
+            if (!warp.getOwner().equals(owner)) {
+                plugin.formator.sendMessage(player, config.load("warps", "messages.yml").getString("not-owner"));
+                return;
+            }
+
             warp.setLocation(loc);
             warp.setOwner(owner);
             plugin.getWarpService().updateWarp(warp);
-        } else {
-            warp = new Warp(name, publicity, type, loc, owner);
-            plugin.getWarpService().createWarp(warp);
-        }
-        plugin.formator.sendMessage(player, plugin.warpUpdated.replace("%warp%", warp.getName()));
 
-        for (Map.Entry<String, ServerInfo> entry : plugin.getProxy().getServers().entrySet()) {
-            ServerInfo serverInfo = entry.getValue();
-            Warp finalWarp = warp;
-            serverInfo.ping((result, error) -> {
-                if (error == null) {
-                    new BungeePluginChannel(plugin, serverInfo, "CreateWarp", finalWarp.serialize()).send();
-                }
-            });
+            plugin.formator.sendMessage(player, plugin.warpUpdated.replace("%warp%", warp.getName()));
+            return;
+        } else {
+            warp = new Warp(warpName, loc, owner);
+            plugin.getWarpService().createWarp(warp);
+
+            plugin.formator.sendMessage(player, plugin.warpCreated.replace("%warp%", warp.getName()));
+            return;
         }
     }
 }

@@ -21,46 +21,22 @@ public class ListController {
         this.plugin = plugin;
     }
 
-    public void listWarp(ProxiedPlayer p, boolean hasAccessToGlobal, boolean hasAccessToServer, boolean hasAccessToHidden) {
-        TextComponent global = new TextComponent(plugin.formator.colorize(plugin.listHeaderGlobal));
-        TextComponent server = new TextComponent(plugin.formator.colorize(plugin.listHeaderServer));
-        TextComponent hidden = new TextComponent(plugin.formator.colorize(plugin.listHeaderHidden));
+    public void listWarp(ProxiedPlayer player) {
+        TextComponent listText = new TextComponent(plugin.formator.colorize(plugin.listHeader));
 
-        List<Warp> warps = plugin.getWarpService().getAllWarps();
+        final List<Warp> warps = plugin.getWarpService().getPlayerWarps(player.getUniqueId());
 
         int i = 0;
         String split = plugin.formator.colorize(plugin.listWarpSplitter);
         for (Warp warp : warps) {
-            if (warp.isGlobal() && !warp.isHidden()) {
-                global.addExtra(buildAndAddListElement(warp));
-                if (i != warps.size() - 1) {
-                    global.addExtra(split);
-                }
-            }
-            if (!warp.isGlobal() && warp.getLocation().getServer().equals(p.getServer().getInfo().getName()) && !warp.isHidden()) {
-                server.addExtra(buildAndAddListElement(warp));
-                if (i != warps.size() - 1) {
-                    server.addExtra(split);
-                }
-            }
-            if (warp.isHidden()) {
-                hidden.addExtra(buildAndAddListElement(warp));
-                if (i != warps.size() - 1) {
-                    hidden.addExtra(split);
-                }
+            listText.addExtra(buildAndAddListElement(warp));
+            if (i != warps.size() - 1) {
+                listText.addExtra(split);
             }
             i++;
         }
 
-        if (hasAccessToGlobal) {
-            p.sendMessage(global);
-        }
-        if (hasAccessToServer) {
-            p.sendMessage(server);
-        }
-        if (hasAccessToHidden) {
-            p.sendMessage(hidden);
-        }
+        player.sendMessage(listText);
     }
 
     private TextComponent buildAndAddListElement(Warp warp) {

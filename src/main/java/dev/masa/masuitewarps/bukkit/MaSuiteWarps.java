@@ -1,40 +1,34 @@
 package dev.masa.masuitewarps.bukkit;
 
-import dev.masa.masuitecore.acf.PaperCommandManager;
 import dev.masa.masuitecore.bukkit.chat.Formator;
 import dev.masa.masuitecore.core.Updator;
 import dev.masa.masuitecore.core.api.MaSuiteCoreBukkitAPI;
 import dev.masa.masuitecore.core.channels.BukkitPluginChannel;
 import dev.masa.masuitecore.core.configuration.BukkitConfiguration;
-import dev.masa.masuitecore.core.utils.CommandManagerUtil;
 import dev.masa.masuitewarps.bukkit.commands.MaSuiteWarpsCommand;
-import dev.masa.masuitewarps.bukkit.commands.WarpCommand;
 import dev.masa.masuitewarps.core.models.Warp;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
 
 /**
  * @author Masa
  */
 public class MaSuiteWarps extends JavaPlugin implements Listener {
+    @Getter
+    private static MaSuiteWarps plugin;
     public MaSuiteCoreBukkitAPI api = new MaSuiteCoreBukkitAPI();
     public HashMap<String, Warp> warps = new HashMap<>();
     public BukkitConfiguration config = new BukkitConfiguration();
     public Formator formator = new Formator();
     public boolean perServerWarps = false;
     private boolean requestedPerServerWarps = false;
-    @Getter
-    private static MaSuiteWarps plugin;
 
     @Override
     public void onEnable() {
