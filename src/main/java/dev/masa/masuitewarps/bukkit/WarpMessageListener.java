@@ -5,6 +5,7 @@ import dev.masa.masuitecore.core.objects.Location;
 import dev.masa.masuitewarps.core.models.Warp;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -23,16 +24,16 @@ public class WarpMessageListener implements org.bukkit.plugin.messaging.PluginMe
     }
 
     @Override
-    public void onPluginMessageReceived(String channel, Player player, byte[] message) {
+    public void onPluginMessageReceived(@NotNull String channel, @NotNull Player player, byte[] message) {
         if (!"BungeeCord".equals(channel)) {
             return;
         }
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
 
-        String subchannel;
+        String subChannel;
         try {
-            subchannel = in.readUTF();
-            if ("WarpPlayer".equals(subchannel)) {
+            subChannel = in.readUTF();
+            if ("WarpPlayer".equals(subChannel)) {
                 Player p = Bukkit.getPlayer(UUID.fromString(in.readUTF()));
                 if (p == null) {
                     return;
@@ -46,20 +47,20 @@ public class WarpMessageListener implements org.bukkit.plugin.messaging.PluginMe
                 }
                 p.teleport(bukkitLocation);
             }
-            if ("CreateWarp".equals(subchannel)) {
+            if ("CreateWarp".equals(subChannel)) {
                 Warp warp = Warp.deserialize(in.readUTF().toLowerCase());
                 plugin.warps.put(warp.getName(), warp);
             }
-            if ("WarpCooldown".equals(subchannel)) {
+            if ("WarpCooldown".equals(subChannel)) {
                 Player p = Bukkit.getPlayer(UUID.fromString(in.readUTF()));
                 if (p == null) {
                     return;
                 }
             }
-            if ("SetPerWarpFlag".equals(subchannel)) {
+            if ("SetPerWarpFlag".equals(subChannel)) {
                 plugin.perServerWarps = in.readBoolean();
             }
-            if ("DelWarp".equals(subchannel)) {
+            if ("DelWarp".equals(subChannel)) {
                 plugin.warps.remove(in.readUTF());
             }
         } catch (IOException e) {

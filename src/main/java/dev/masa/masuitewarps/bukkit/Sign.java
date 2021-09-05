@@ -14,6 +14,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Masa
+ */
 public class Sign implements Listener {
 
     private final MaSuiteWarps plugin;

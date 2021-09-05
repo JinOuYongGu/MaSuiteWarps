@@ -17,6 +17,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.event.EventHandler;
 
 import java.io.ByteArrayInputStream;
@@ -27,43 +28,44 @@ import java.io.IOException;
  * @author Masa
  */
 public class MaSuiteWarps extends Plugin implements Listener {
-
-    private final TeleportController teleportController = new TeleportController(this);
-    private final SetController set = new SetController(this);
-    private final DeleteController delete = new DeleteController(this);
-    private final ListController list = new ListController(this);
+    private static MaSuiteWarps plugin;
+    private static TeleportController teleportController;
+    private static SetController setController;
+    private static DeleteController deleteController;
+    private static ListController listController;
     @Getter
     private final MaSuiteCoreAPI api = new MaSuiteCoreAPI();
     public Utils utils = new Utils();
     public BungeeConfiguration config = new BungeeConfiguration();
     public Formator formator = new Formator();
     public boolean perWarpPermission = false;
-    public String warpNotFound = "";
-    public String noPermission = "";
-    public String warpInOtherServer = "";
-    public String teleported = "";
-    public String listHeader = "";
-    public String listHeaderServer = "";
-    public String listHeaderHidden = "";
-    public String listWarpName = "";
-    public String listHoverText = "";
-    public String listWarpSplitter = "";
-    public String warpCreated = "";
-    public String warpUpdated = "";
-    public String warpDeleted = "";
+    @Getter
+    private Configuration messageConfig = null;
     @Getter
     private WarpService warpService;
 
+    public static MaSuiteWarps getPlugin() {
+        return plugin;
+    }
+
     @Override
     public void onEnable() {
-        // Configuration
+        plugin = this;
+
+        // Config and message
         config.create(this, "warps", "messages.yml");
         config.create(this, "warps", "settings.yml");
+        messageConfig = config.load("warps", "messages.yml");
+
+        // Controllers
+        teleportController = new TeleportController();
+        setController = new SetController();
+        deleteController = new DeleteController();
+        listController = new ListController();
+
         getProxy().getPluginManager().registerListener(this, this);
 
         warpService = new WarpService(this);
-
-
         warpService.initializeWarps();
 
         // Send list of warp
@@ -71,19 +73,6 @@ public class MaSuiteWarps extends Plugin implements Listener {
 
         // Updator
         new Updator(getDescription().getVersion(), getDescription().getName(), "60454").checkUpdates();
-
-        perWarpPermission = config.load("warps", "settings.yml").getBoolean("enable-per-warp-permission");
-        warpNotFound = config.load("warps", "messages.yml").getString("warp-not-found");
-        noPermission = config.load("warps", "messages.yml").getString("no-permission");
-        warpInOtherServer = config.load("warps", "messages.yml").getString("warp-in-other-server");
-        teleported = config.load("warps", "messages.yml").getString("teleported");
-        listHeader = config.load("warps", "messages.yml").getString("warp.list");
-        listWarpName = config.load("warps", "messages.yml").getString("warp.name");
-        listHoverText = config.load("warps", "messages.yml").getString("warp-hover-text");
-        listWarpSplitter = config.load("warps", "messages.yml").getString("warp.split");
-        warpCreated = config.load("warps", "messages.yml").getString("warp-created");
-        warpUpdated = config.load("warps", "messages.yml").getString("warp-updated");
-        warpDeleted = config.load("warps", "messages.yml").getString("warp-deleted");
     }
 
     @EventHandler
@@ -96,10 +85,7 @@ public class MaSuiteWarps extends Plugin implements Listener {
 
         if ("ListWarps".equals(subchannel)) {
             ProxiedPlayer player = getProxy().getPlayer(in.readUTF());
-            if (player == null) {
-                return;
-            }
-            list.listWarp(player);
+            listController.listWarp(player);
         }
 
         if ("Warp".equals(subchannel)) {
@@ -121,21 +107,21 @@ public class MaSuiteWarps extends Plugin implements Listener {
             Location location = new Location().deserialize(in.readUTF());
             int maxWarpCount = in.readInt();
 
-            set.setWarp(player, name, location, maxWarpCount);
+            setController.setWarp(player, name, location, maxWarpCount);
         }
         if ("DelWarp".equals(subchannel)) {
             ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
             if (p == null) {
                 return;
             }
-            delete.deleteWarp(p, p.getUniqueId(), in.readUTF());
+            deleteController.deleteWarp(p, p.getUniqueId(), in.readUTF());
         }
         if ("DelWarpOther".equalsIgnoreCase(subchannel)) {
             ProxiedPlayer p = getProxy().getPlayer(in.readUTF());
             if (p == null) {
                 return;
             }
-            delete.deleteOthersWarp(p, in.readUTF(), in.readUTF());
+            deleteController.deleteOthersWarp(p, in.readUTF(), in.readUTF());
         }
         if ("RequestWarps".equals(subchannel)) {
             this.getWarpService().sendAllWarpsToServers();

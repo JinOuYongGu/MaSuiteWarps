@@ -3,7 +3,6 @@ package dev.masa.masuitewarps.bukkit.commands;
 import dev.masa.masuitecore.core.adapters.BukkitAdapter;
 import dev.masa.masuitecore.core.channels.BukkitPluginChannel;
 import dev.masa.masuitewarps.bukkit.MaSuiteWarps;
-import dev.masa.masuitewarps.core.models.Warp;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -12,6 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -22,9 +22,10 @@ import java.util.regex.Pattern;
 public class MaSuiteWarpsCommand implements TabCompleter, CommandExecutor {
     private static final MaSuiteWarps PLUGIN = MaSuiteWarps.getPlugin();
     private static final Pattern WARP_NAME_PATTERN = Pattern.compile("^[_a-zA-Z0-9\\u4e00-\\u9fa5]{5,16}$");
+    private static final Pattern ADMIN_WARP_NAME_PATTERN = Pattern.compile("^[_a-zA-Z0-9\\u4e00-\\u9fa5]{1,32}$");
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if ("setwarp".equalsIgnoreCase(label)) {
             return setwarpCmd(sender, args);
         }
@@ -53,7 +54,17 @@ public class MaSuiteWarpsCommand implements TabCompleter, CommandExecutor {
             return true;
         }
 
-        PLUGIN.formator.sendMessage(player, PLUGIN.config.load("warps", "messages.yml").getString("Msg.wrong-command-format"));
+        if (args.length == 1 && sender.isOp()) {
+            Player playerToFind = Bukkit.getPlayer(args[0]);
+            if (playerToFind == null) {
+                PLUGIN.formator.sendMessage(sender, PLUGIN.config.load("warps", "messages.yml").getString("invalid-player"));
+                return false;
+            }
+            new BukkitPluginChannel(PLUGIN, player, "ListWarps", playerToFind.getName()).send();
+            return true;
+        }
+
+        PLUGIN.formator.sendMessage(player, PLUGIN.config.load("warps", "messages.yml").getString("wrong-command-format"));
         return false;
     }
 
@@ -66,10 +77,6 @@ public class MaSuiteWarpsCommand implements TabCompleter, CommandExecutor {
 
         if (args.length == 1) {
             String warpName = args[0];
-            if (!WARP_NAME_PATTERN.matcher(warpName).matches()) {
-                PLUGIN.formator.sendMessage(player, PLUGIN.config.load("warps", "messages.yml").getString("Msg.invalid-warp-name"));
-                return false;
-            }
             new BukkitPluginChannel(PLUGIN, player, "DelWarp", player.getName(), warpName).send();
             return true;
         }
@@ -80,17 +87,12 @@ public class MaSuiteWarpsCommand implements TabCompleter, CommandExecutor {
             }
 
             String warpName = args[1];
-            if (!WARP_NAME_PATTERN.matcher(warpName).matches()) {
-                PLUGIN.formator.sendMessage(player, PLUGIN.config.load("warps", "messages.yml").getString("Msg.invalid-warp-name"));
-                return false;
-            }
-
             String ownerName = args[0];
             new BukkitPluginChannel(PLUGIN, player, "DelWarpOther", player.getName(), ownerName, warpName).send();
             return true;
         }
 
-        PLUGIN.formator.sendMessage(player, PLUGIN.config.load("warps", "messages.yml").getString("Msg.wrong-command-format"));
+        PLUGIN.formator.sendMessage(player, PLUGIN.config.load("warps", "messages.yml").getString("wrong-command-format"));
         return false;
     }
 
@@ -103,8 +105,12 @@ public class MaSuiteWarpsCommand implements TabCompleter, CommandExecutor {
 
         if (args.length == 1) {
             String warpName = args[0];
-            if (!WARP_NAME_PATTERN.matcher(warpName).matches()) {
-                PLUGIN.formator.sendMessage(player, PLUGIN.config.load("warps", "messages.yml").getString("Msg.invalid-warp-name"));
+            if (!player.isOp() && !WARP_NAME_PATTERN.matcher(warpName).matches()) {
+                PLUGIN.formator.sendMessage(player, PLUGIN.config.load("warps", "messages.yml").getString("invalid-warp-name"));
+                return false;
+            }
+            if (player.isOp() && !ADMIN_WARP_NAME_PATTERN.matcher(warpName).matches()) {
+                PLUGIN.formator.sendMessage(player, PLUGIN.config.load("warps", "messages.yml").getString("invalid-warp-name"));
                 return false;
             }
 
@@ -115,13 +121,13 @@ public class MaSuiteWarpsCommand implements TabCompleter, CommandExecutor {
             return true;
         }
 
-        PLUGIN.formator.sendMessage(sender, PLUGIN.config.load("warps", "messages.yml").getString("Msg.wrong-command-format"));
+        PLUGIN.formator.sendMessage(sender, PLUGIN.config.load("warps", "messages.yml").getString("wrong-command-format"));
         return false;
     }
 
     private boolean warpCmd(CommandSender sender, String[] args) {
         if (args.length <= 0) {
-            PLUGIN.formator.sendMessage(sender, PLUGIN.config.load("warps", "messages.yml").getString("Msg.wrong-command-format"));
+            PLUGIN.formator.sendMessage(sender, PLUGIN.config.load("warps", "messages.yml").getString("wrong-command-format"));
             return false;
         }
 
@@ -140,23 +146,23 @@ public class MaSuiteWarpsCommand implements TabCompleter, CommandExecutor {
             return true;
         }
 
-        if (args.length == 2 && !(sender instanceof Player)) {
+        if (args.length == 2 && sender.isOp()) {
             // Executed by console
             Player playerToWarp = Bukkit.getPlayer(args[1]);
             if (playerToWarp == null || !playerToWarp.isOnline()) {
-                PLUGIN.formator.sendMessage(sender, PLUGIN.config.load("warps", "messages.yml").getString("Msg.no-such-player"));
+                PLUGIN.formator.sendMessage(sender, PLUGIN.config.load("warps", "messages.yml").getString("invalid-player"));
                 return false;
             }
             new BukkitPluginChannel(PLUGIN, playerToWarp, "Warp", playerToWarp.getName(), warpName).send();
             return true;
         }
 
-        PLUGIN.formator.sendMessage(sender, PLUGIN.config.load("warps", "messages.yml").getString("Msg.wrong-command-format"));
+        PLUGIN.formator.sendMessage(sender, PLUGIN.config.load("warps", "messages.yml").getString("wrong-command-format"));
         return false;
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
         return null;
     }
 
@@ -170,7 +176,7 @@ public class MaSuiteWarpsCommand implements TabCompleter, CommandExecutor {
             String permission = permInfo.getPermission();
             if (permission.startsWith("masuitewarps.warp.limit.")) {
                 String count = permission.replace("masuitewarps.warp.limit.", "");
-                int warpCount = 0;
+                int warpCount;
                 try {
                     warpCount = Integer.parseInt(count);
                 } catch (NumberFormatException e) {

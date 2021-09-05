@@ -61,6 +61,10 @@ public class Warp {
         this.owner = ownerId;
     }
 
+    public static Warp deserialize(String json) {
+        return new Gson().fromJson(json, Warp.class);
+    }
+
     public Location getLocation() {
         return new Location(server, world, x, y, z, yaw, pitch);
     }
@@ -77,9 +81,5 @@ public class Warp {
 
     public String serialize() {
         return new Gson().toJson(this);
-    }
-
-    public static Warp deserialize(String json) {
-        return new Gson().fromJson(json, Warp.class);
     }
 }

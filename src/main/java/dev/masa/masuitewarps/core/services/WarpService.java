@@ -65,7 +65,7 @@ public class WarpService {
         } else {
             bsc.send();
         }
-        plugin.formator.sendMessage(player, plugin.teleported.replace("%warp%", warp.getName()));
+        plugin.formator.sendMessage(player, plugin.getMessageConfig().getString("teleported").replace("%warp%", warp.getName()));
     }
 
     /**
@@ -122,9 +122,8 @@ public class WarpService {
      * Updates the warp
      *
      * @param warp warp to update
-     * @return returns updated warp
      */
-    public Warp updateWarp(Warp warp) {
+    public void updateWarp(Warp warp) {
         plugin.getProxy().getScheduler().runAsync(plugin, () -> {
             try {
                 warpDao.update(warp);
@@ -135,7 +134,6 @@ public class WarpService {
         warps.put(warp.getName().toLowerCase(), warp);
 
         this.sendWarpToServers(warp);
-        return warp;
     }
 
     /**

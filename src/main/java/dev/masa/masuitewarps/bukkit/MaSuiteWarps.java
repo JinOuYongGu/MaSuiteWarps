@@ -44,7 +44,7 @@ public class MaSuiteWarps extends JavaPlugin implements Listener {
 
         // Register events
         getServer().getPluginManager().registerEvents(this, this);
-        getServer().getPluginManager().registerEvents(new Sign(this), this);
+        //getServer().getPluginManager().registerEvents(new Sign(this), this);
 
         // Register commands
         MaSuiteWarpsCommand maSuiteWarpsCommand = new MaSuiteWarpsCommand();
